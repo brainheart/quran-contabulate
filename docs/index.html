@@ -169,6 +169,9 @@
   let addColumnPromptTimer = null;
   let addColumnPromptStepIndex = 0;
   let extraTerms = [];
+  // Declared early: a deep link draws term headers during startup.
+  const LONG_TERM_LABEL = 28; // characters, including the leading "# " and quotes
+  const expandedTermLabels = new Set();
   let showZeroRows = false;
   // Optional metric columns (off by default; toggled in Options, persisted in deep links via `mc=`)
   const METRIC_COL_DEFS = [
@@ -1336,6 +1339,34 @@
         segmentsCurrentPage = 1;
         renderSegmentsPage();
       });
+      // A long term (typically a pattern inserted from the lookup) is cut to
+      // one short line so the header row stays low. Hovering shows the whole
+      // term; the small toggle expands it in place, which also works on
+      // touch screens. The full text stays in the DOM for CSV and links.
+      if (Number.isInteger(c.termIdx) && Array.from(c.label).length > LONG_TERM_LABEL) {
+        const expanded = expandedTermLabels.has(c.label);
+        labelSpan.classList.add('th-label-long');
+        labelSpan.classList.toggle('is-expanded', expanded);
+        th.title = `${c.label}\nClick to sort.`;
+        const toggle = document.createElement('button');
+        toggle.type = 'button';
+        toggle.className = 'term-col-expand';
+        const sync = (open) => {
+          toggle.textContent = open ? 'less' : 'more';
+          toggle.title = open ? 'Shorten this term' : 'Show the whole term';
+          toggle.setAttribute('aria-label', toggle.title);
+          toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        };
+        sync(expanded);
+        toggle.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const open = !labelSpan.classList.contains('is-expanded');
+          labelSpan.classList.toggle('is-expanded', open);
+          if (open) expandedTermLabels.add(c.label); else expandedTermLabels.delete(c.label);
+          sync(open);
+        });
+        th.appendChild(toggle);
+      }
       if (Number.isInteger(c.termIdx)) {
         const removeBtn = document.createElement('button');
         removeBtn.type = 'button';

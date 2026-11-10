@@ -1229,3 +1229,9 @@ p [lang="ar"] { font-size: 1.3em; font-style: normal; line-height: 1; }
 .lexicon-root { border-style: dashed; }
 .lexicon-empty { margin: .7rem .8rem; }
 .word-gloss { min-width: 12rem; max-width: 26rem; }
+
+/* Long search terms in a column header: one short line until expanded. */
+.th-label-long { display: inline-block; max-width: 13rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
+.th-label-long.is-expanded { min-width: 16rem; max-width: 24rem; white-space: normal; overflow-wrap: anywhere; line-height: 1.5; }
+.term-col-expand { margin-left: .3rem; padding: 0 .35rem; border: 1px solid var(--border, #d4c5b0); border-radius: 999px; background: #fff; color: var(--burgundy, #8b1538); font: inherit; font-size: .72rem; line-height: 1.4; cursor: pointer; vertical-align: middle; }
+.term-col-expand:hover, .term-col-expand:focus-visible { border-color: var(--burgundy, #8b1538); }

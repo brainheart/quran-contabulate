@@ -53,6 +53,56 @@ test('an English word finds its Arabic dictionary forms and inserts all their sp
   expect(errors).toEqual([]);
 });
 
+test('a long inserted pattern keeps the header row low until expanded', async ({ page }, testInfo) => {
+  const fs = require('node:fs');
+  await ready(page);
+  const plainHeight = (await page.locator('#results thead tr').boundingBox()).height;
+  await page.fill('#lexiconInput', 'say');
+  await page.locator('.lexicon-item').first().locator('.lexicon-insert').click();
+  const pattern = await page.inputValue('#q');
+  expect(pattern.length).toBeGreaterThan(150);
+  await page.click('#addColumnBtn');
+  const th = page.locator('th[data-key="t0_count"]');
+  await expect(th).toBeVisible();
+  const label = th.locator('.th-label');
+  const toggle = th.locator('.term-col-expand');
+  // Cut to one line: the whole pattern is still there, for hover and export.
+  await expect(label).toHaveText(`# /${pattern}/`);
+  await expect(th).toHaveAttribute('title', new RegExp('^# /\\^'));
+  expect((await th.getAttribute('title')).startsWith(`# /${pattern}/`)).toBeTruthy();
+  await expect(toggle).toHaveText('more');
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  const cut = await label.evaluate(el => ({ shown: el.clientWidth, full: el.scrollWidth }));
+  expect(cut.full).toBeGreaterThan(cut.shown);
+  const collapsed = (await page.locator('#results thead tr').boundingBox()).height;
+  expect(collapsed).toBeLessThan(plainHeight + 30);
+
+  // Expanding does not sort or remove the column, and survives a re-render.
+  await toggle.click();
+  await expect(toggle).toHaveText('less');
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+  await expect(th).toHaveClass(/sorted-desc/);
+  expect((await page.locator('#results thead tr').boundingBox()).height).toBeGreaterThan(collapsed + 20);
+  await page.locator('th[data-key="location"]').click();
+  await expect(page.locator('th[data-key="t0_count"] .term-col-expand')).toHaveText('less');
+  await page.locator('th[data-key="t0_count"] .term-col-expand').click();
+  await expect(page.locator('th[data-key="t0_count"] .term-col-expand')).toHaveText('more');
+  expect((await page.locator('#results thead tr').boundingBox()).height).toBeLessThan(plainHeight + 30);
+
+  // The CSV header carries the whole term, not the shortened one.
+  await page.locator('#segmentsTab details summary').click();
+  const downloadPromise = page.waitForEvent('download');
+  await page.click('#downloadSegmentsCsv');
+  const destination = testInfo.outputPath('long-term.csv');
+  await (await downloadPromise).saveAs(destination);
+  expect(fs.readFileSync(destination, 'utf8').split('\n')[0]).toContain(`# /${pattern}/`);
+
+  // Short terms are left alone.
+  await ready(page, '/?q=' + encodeURIComponent('الله') + '&gran=play');
+  await expect(page.locator('th[data-key="t0_count"] .term-col-expand')).toHaveCount(0);
+  await expect(page.locator('th[data-key="t0_count"] .th-label')).not.toHaveClass(/th-label-long/);
+});
+
 test('a single written form or a whole root can be inserted instead', async ({ page }) => {
   await ready(page);
   await page.fill('#lexiconInput', 'mercy');
