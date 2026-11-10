@@ -22,12 +22,18 @@
     </div>
   </div>
   <h1><a href="https://contabulate.org/">Contabulate</a>: ☪️ Quran Tabular Explorer</h1>
-  <p class="muted">A sortable, filterable table of the Quran in Arabic — by period, sura, section, or verse, or flipped to its vocabulary: word, bigram, and trigram rows. Add search-term columns (1–3 words) and text metrics such as words per pause and lexical rarity; the metrics live under the <strong>+</strong> at the right edge of the table. Text: <a href="https://tanzil.net/" target="_blank" rel="noopener">Tanzil Project</a> Quran text (Simple, version 1.1), reproduced verbatim under <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>. The English column is Pickthall’s 1930 translation, shown as a reading aid. Sections are the traditional <i>rukūʿ</i> divisions; the period is the customary Meccan or Medinan label of each sura.</p>
+  <p class="muted">A sortable, filterable table of the Quran in Arabic — by period, sura, section, or verse, or flipped to its vocabulary: word, bigram, and trigram rows. Add search-term columns (1–3 words) and text metrics such as words per pause and lexical rarity; the metrics live under the <strong>+</strong> at the right edge of the table. Text: <a href="https://tanzil.net/" target="_blank" rel="noopener">Tanzil Project</a> Quran text (Simple, version 1.1), reproduced verbatim under <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>. The English column is Pickthall’s 1930 translation; word glosses, dictionary forms, and roots are from the <a href="https://corpus.quran.com/" target="_blank" rel="noopener">Quranic Arabic Corpus</a>. Both are reading aids. Sections are the traditional <i>rukūʿ</i> divisions; the period is the customary Meccan or Medinan label of each sura.</p>
 
-  <p class="muted">Search runs on the Arabic and ignores vowel marks and recitation signs, so <span lang="ar" dir="rtl">الله</span> finds <span lang="ar" dir="rtl">اللَّهُ</span>, <span lang="ar" dir="rtl">اللَّهِ</span>, and <span lang="ar" dir="rtl">اللَّهَ</span>. Letters are matched as written, and a word keeps its attached particles: <span lang="ar" dir="rtl">وَاللَّهُ</span>, <span lang="ar" dir="rtl">بِاللَّهِ</span>, and <span lang="ar" dir="rtl">لِلَّهِ</span> are separate words — use a regex to gather them. Try <a href="?q=%D8%A7%D9%84%D9%84%D9%87&amp;gran=line"><span lang="ar" dir="rtl">الله</span></a>, the phrase <a href="?q=%D8%B1%D8%A8%20%D8%A7%D9%84%D8%B9%D8%A7%D9%84%D9%85%D9%8A%D9%86&amp;gran=line"><span lang="ar" dir="rtl">رب العالمين</span></a>, or <a href="?q=%5E%28%5B%D9%88%D9%81%D8%A3%5D%2A%5B%D8%A8%D8%AA%5D%3F%D8%A7%3F%7C%D8%A2%29%D9%84%D9%84%D9%87%24&amp;mm=regex&amp;nm=1&amp;gran=play">every written form of the divine name, by sura</a>. To search the English, filter the English column. <a href="sources.html">Edition, numbering, and sources</a>.</p>
+  <p class="muted">Search runs on the Arabic and ignores vowel marks and recitation signs, so <span lang="ar" dir="rtl">الله</span> finds <span lang="ar" dir="rtl">اللَّهُ</span>, <span lang="ar" dir="rtl">اللَّهِ</span>, and <span lang="ar" dir="rtl">اللَّهَ</span>. Letters are matched as written, and a word keeps its attached particles: <span lang="ar" dir="rtl">وَاللَّهُ</span>, <span lang="ar" dir="rtl">بِاللَّهِ</span>, and <span lang="ar" dir="rtl">لِلَّهِ</span> are separate words — use a regex to gather them. Try <a href="?q=%D8%A7%D9%84%D9%84%D9%87&amp;gran=line"><span lang="ar" dir="rtl">الله</span></a>, the phrase <a href="?q=%D8%B1%D8%A8%20%D8%A7%D9%84%D8%B9%D8%A7%D9%84%D9%85%D9%8A%D9%86&amp;gran=line"><span lang="ar" dir="rtl">رب العالمين</span></a>, or <a href="?q=%5E%28%5B%D9%88%D9%81%D8%A3%5D%2A%5B%D8%A8%D8%AA%5D%3F%D8%A7%3F%7C%D8%A2%29%D9%84%D9%84%D9%87%24&amp;mm=regex&amp;nm=1&amp;gran=play">every written form of the divine name, by sura</a>. No Arabic? Use the lookup box to find a word by its English meaning; the word views show an English gloss, dictionary form, and root for every word. To search Pickthall’s English, filter the English column. <a href="sources.html">Edition, numbering, and sources</a>.</p>
 
   <div class="tab-content" id="segmentsTab">
     <div class="controls">
+      <div id="lexicon" class="lexicon is-hidden">
+        <label class="label-strong" for="lexiconInput">Find an Arabic word by its English meaning:</label>
+        <input id="lexiconInput" class="query-input lexicon-input" type="search" autocomplete="off" spellcheck="false" placeholder="e.g. mercy, light, patience" aria-controls="lexiconResults">
+        <span class="muted lexicon-hint">Pick a word to put it in the search box below, then hit “Add”.</span>
+        <div id="lexiconResults" class="lexicon-results is-hidden" aria-live="polite"></div>
+      </div>
       <div class="controls-row">
         <div class="control-group">
           <span class="label-strong">Each row is a</span>
@@ -132,6 +138,7 @@
   </div>
 
 <script src="js/utils.js"></script>
+<script src="js/glossary.js"></script>
 <script src="js/table-ui.js"></script>
 <script src="js/filter-popover.js"></script>
 <script src="js/color-scale.js"></script>
@@ -741,11 +748,11 @@
     return res.json();
   }
 
-  let chunks=[], tokens={}, tokens2={}, tokens3={}, plays=[], characters=[], tokensChar={}, tokensChar2={}, tokensChar3={}, allLines=[], characterNameFilterConfig=null, commentaryInterestConfig=null;
+  let chunks=[], tokens={}, tokens2={}, tokens3={}, plays=[], characters=[], tokensChar={}, tokensChar2={}, tokensChar3={}, allLines=[], characterNameFilterConfig=null, commentaryInterestConfig=null, glossaryData=null;
   let allLinesLoadPromise = null;
   setLoadingState(true, "Loading data...");
   try {
-    [chunks, tokens, tokens2, tokens3, plays, characters, tokensChar, tokensChar2, tokensChar3, characterNameFilterConfig, commentaryInterestConfig] = await Promise.all([
+    [chunks, tokens, tokens2, tokens3, plays, characters, tokensChar, tokensChar2, tokensChar3, characterNameFilterConfig, commentaryInterestConfig, glossaryData] = await Promise.all([
       loadJSON('data/chunks.json'),
       loadJSON('data/tokens.json'),
       loadJSON('data/tokens2.json'),
@@ -757,6 +764,8 @@
       loadJSON('data/tokens_char3.json'),
       loadJSON('data/character_name_filter_config.json').catch(() => null),
       loadJSON('data/commentary_interest.json').catch(() => null),
+      // Reading aids only: the explorer works without them.
+      loadJSON('data/glossary.json').catch(() => null),
     ]);
   } catch(e) {
     setLoadingState(false);
@@ -766,6 +775,28 @@
   }
 
   setLoadingState(false);
+
+  // English glosses, lemmas, and roots (js/glossary.js). When the data is
+  // missing, the lookup box and the gloss columns simply do not appear.
+  const glossary = window.contabulateGlossary;
+  const glossaryAvailable = !!(glossary && glossary.init(glossaryData));
+  glossaryData = null;
+  if (glossaryAvailable) {
+    setElementHidden(document.getElementById('lexicon'), false);
+    glossary.wireLookup({
+      input: document.getElementById('lexiconInput'),
+      results: document.getElementById('lexiconResults'),
+      insert: (text, mode) => {
+        matchMode.value = mode;
+        if (mode === 'regex') ngramMode.value = '1';
+        clearTermWarning();
+        updateSegmentsMatchModeUI();
+        q.value = text;
+        q.dispatchEvent(new Event('input', { bubbles: true }));
+        q.focus();
+      }
+    });
+  }
 
   async function ensureAllLinesLoaded({ showOverlay = false } = {}) {
     if (Array.isArray(allLines) && allLines.length > 0) return allLines;
@@ -2045,7 +2076,7 @@
         let re = null;
         // Arabic cells are matched in their search form, so a filter typed
         // without vowel marks finds the vocalized text.
-        const arabicCell = key === 'line' || key === 'ngram' || key === 'name_ar';
+        const arabicCell = key === 'line' || key === 'ngram' || key === 'name_ar' || key === 'lemma' || key === 'root';
         try { re = new RegExp(arabicCell ? normalizeRegexSource(f.pattern) : f.pattern, 'i'); } catch(e) { re = null; }
         if (!re) continue;
         out = out.filter(r => re.test(arabicCell ? stripArabicMarks(r[key] ?? '') : String(r[key] ?? '')));
@@ -2385,6 +2416,9 @@
         // missing from one book outscored genuinely concentrated words).
         raw.push({
           ngram,
+          gloss: glossaryAvailable ? glossary.ngramGloss(ngram) : '',
+          lemma: (glossaryAvailable && n === 1) ? glossary.ngramLemma(ngram) : '',
+          root: (glossaryAvailable && n === 1) ? glossary.ngramRoot(ngram) : '',
           count: tf,
           verse_count: verses,
           book_count: df,
@@ -2420,6 +2454,16 @@
     }
     const cols = [
       { key: 'ngram', label: vocabColumnLabel(granVal), defaultDir: 'asc', type: 'text' },
+      ...(glossaryAvailable ? [{ key: 'gloss', label: 'English (word by word)', defaultDir: 'asc', type: 'text',
+        tooltip: n === 1
+          ? 'How the Quranic Arabic Corpus glosses this written form, most frequent glosses first. A reading aid; it is not searched.'
+          : 'The most frequent Quranic Arabic Corpus gloss of each word, in order. A reading aid; it is not searched.' }] : []),
+      ...((glossaryAvailable && n === 1) ? [
+        { key: 'lemma', label: 'Dictionary form', defaultDir: 'asc', type: 'text',
+          tooltip: 'The dictionary form (lemma) this written form belongs to, from the Quranic Arabic Corpus. Several are listed when one spelling serves different words.' },
+        { key: 'root', label: 'Root', defaultDir: 'asc', type: 'text',
+          tooltip: 'The consonantal root, from the Quranic Arabic Corpus. Filter this column to gather every form built on one root.' },
+      ] : []),
       { key: 'count', label: 'Count', type: 'number', defaultDir: 'desc' },
       { key: 'book_count', label: '# suras', type: 'number', defaultDir: 'desc' },
       { key: 'verse_count', label: '# verses', type: 'number', defaultDir: 'desc' },
@@ -2533,6 +2577,8 @@
         if (k === 'title' || k === 'play_title') td.classList.add('book-cell');
         if (k === 'gloss') td.classList.add('gloss-text');
         if (k === 'name_ar') { td.lang = 'ar'; td.dir = 'rtl'; td.classList.add('arabic'); }
+        if (k === 'lemma' || k === 'root') { td.lang = 'ar'; td.classList.add('arabic'); }
+        if (k === 'gloss' && isVocabGranularity(granVal)) td.classList.replace('gloss-text', 'word-gloss');
         const rankHint = getNumericRankHint(numericRankIndex, k, r[k]);
         if (rankHint) {
           td.classList.add('ranked-cell');

@@ -16,4 +16,10 @@ Source files are pinned and checked by SHA-256. Generated files in `docs/data`,
 - Sections are Tanzil's rukūʿ boundaries; locations are
   `SSS.Abbr.§RR.VVV`. Sura names and meanings are curated in `scripts/source.py`.
 - The English gloss is display-only. Do not index it.
+- `docs/data/glossary.json` (word glosses, lemmas, roots) is built by
+  `scripts/glossary.py` from the Quranic Arabic Corpus files in
+  `source_text/qac`, pinned by commit and SHA-256. It is a reading aid: the
+  page must keep working when it fails to load, and nothing in it may change a
+  count. The corpus annotates Uthmani words; the alignment to the Simple text
+  must account for exactly 370 split words.
 - `created` in `instance-meta.json` stays 2026-11-10.

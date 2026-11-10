@@ -5,6 +5,7 @@ import re
 import unicodedata
 from pathlib import Path
 
+from scripts.glossary import QAC_COMMIT, build_glossary
 from scripts.source import (  # noqa: F401
     EDITION, GLOSS_LABEL, count_pause_units, load_clean_verses, load_suras, verify_source_files,
 )
@@ -229,6 +230,13 @@ def build(source_path: Path, out_dir: Path):
         "play_removals": {},
     })
     write_json(lines_dir / "all_lines.json", all_lines)
+    # English glosses, lemmas, and roots for every word form (reading aids).
+    glossary, glossary_stats, _ = build_glossary(source_path, all_lines, tokenize, normalize)
+    write_json(data_dir / "glossary.json", {
+        "source": "Quranic Arabic Corpus (https://corpus.quran.com), word-by-word translation and "
+                  f"morphology, kaisdukes/quranic-corpus-api@{QAC_COMMIT[:7]}; GNU GPL",
+        **glossary,
+    })
     # Tanzil asks that its notice travel with files derived from the text.
     notice = (ROOT / "source_text" / "TANZIL-NOTICE.txt").read_text(encoding="utf-8")
     (lines_dir / "NOTICE.txt").write_text(notice, encoding="utf-8")
@@ -240,6 +248,10 @@ def build(source_path: Path, out_dir: Path):
         "verse_count": len(chunks),
         "word_count": instance_payload["stats"]["words"],
         "distinct_words": len(tokens),
+        "lemmas": glossary_stats["lemmas"],
+        "roots": glossary_stats["roots"],
+        "split_words": glossary_stats["split_words"],
+        "vocative_splits": glossary_stats["vocative_splits"],
     }
 
 
@@ -252,5 +264,6 @@ if __name__ == "__main__":
         "Done: "
         f"{result['sura_count']} suras, {result['section_count']} sections, "
         f"{result['verse_count']} verses, {result['word_count']} words, "
-        f"{result['distinct_words']} distinct words"
+        f"{result['distinct_words']} distinct words; glossary: "
+        f"{result['lemmas']} lemmas, {result['roots']} roots"
     )

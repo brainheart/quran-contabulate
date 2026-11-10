@@ -25,5 +25,34 @@
       "sha256": "4aabbfa9d96796f5a6b0217d2c39dce1a3084f772bf6f2650e37082a774e3cc7",
       "url": "https://tanzil.net/trans/en.pickthall"
     }
-  ]
+  ],
+  "glossary": {
+    "publisher": "Quranic Arabic Corpus, Kais Dukes, https://corpus.quran.com/",
+    "repository": "https://github.com/kaisdukes/quranic-corpus-api",
+    "commit": "17a9062416eccc332111ef3e84f74072d709e187",
+    "retrieved": "2026-11-10",
+    "license": "GNU General Public License, as stated by the Quranic Arabic Corpus project; use requires naming the corpus as the source and linking to corpus.quran.com. The data repository itself carries no license file.",
+    "files": [
+      {
+        "name": "word-by-word.txt",
+        "sha256": "f732efe12ed56c36c2f94525ed28f4b4e9a4290bdf31a2640bc210d6a9e015d5",
+        "url": "https://raw.githubusercontent.com/kaisdukes/quranic-corpus-api/17a9062416eccc332111ef3e84f74072d709e187/src/main/resources/data/translation/word-by-word.txt"
+      },
+      {
+        "name": "morphology.txt",
+        "sha256": "f1d3417be9aac22d54fff9ddc34db0818d7f490d836471a0d9163b3a2c11c065",
+        "url": "https://raw.githubusercontent.com/kaisdukes/quranic-corpus-api/17a9062416eccc332111ef3e84f74072d709e187/src/main/resources/data/morphology.txt"
+      },
+      {
+        "name": "lemmas.txt",
+        "sha256": "631fd141d1a0d7b771b638bf8a30a73c97391e5086af98978b9260062cf1ee04",
+        "url": "https://raw.githubusercontent.com/kaisdukes/quranic-corpus-api/17a9062416eccc332111ef3e84f74072d709e187/src/main/resources/data/lemmas.txt"
+      },
+      {
+        "name": "quran-uthmani.xml",
+        "sha256": "caeeb8784961f66183efaf7ec86448c65e7a1536ca4204158a972a897b8420be",
+        "url": "https://raw.githubusercontent.com/kaisdukes/quranic-corpus-api/17a9062416eccc332111ef3e84f74072d709e187/src/main/resources/data/quran-uthmani.xml"
+      }
+    ]
+  }
 }

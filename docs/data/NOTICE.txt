@@ -35,3 +35,8 @@ Source: https://tanzil.net/  (download: https://tanzil.net/download/)
 The English gloss is Mohammed Marmaduke Pickthall, The Meaning of the Glorious
 Koran (1930), in the text distributed by Tanzil as en.pickthall
 (https://tanzil.net/trans/), provided there for non-commercial use.
+
+Word glosses, dictionary forms (lemmas), and roots in glossary.json are derived
+from the Quranic Arabic Corpus by Kais Dukes (https://corpus.quran.com/),
+word-by-word translation and morphological annotation, distributed by that
+project under the GNU General Public License.

@@ -10,7 +10,7 @@ import unittest
 import xml.etree.ElementTree as ET
 
 import build
-from scripts import source
+from scripts import glossary, source
 
 ROOT = Path(__file__).resolve().parents[1]
 BASMALA = 'بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ'
@@ -209,6 +209,94 @@ class CorpusTests(unittest.TestCase):
             self.assertTrue(0 < sura['mattr_50'] <= 1)
         self.assertEqual(read('docs/data/characters.json'), [])
         self.assertFalse(read('docs/data/character_name_filter_config.json')['enabled'])
+
+
+class GlossaryTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.glossary = read('docs/data/glossary.json')
+        cls.tokens = read('docs/data/tokens.json')
+        cls.lines = read('docs/lines/all_lines.json')
+        cls.lemmas = cls.glossary['lemmas']
+        cls.forms = cls.glossary['forms']
+
+    def lemma(self, arabic):
+        found = [e for e in self.lemmas if nfc(e['ar']) == nfc(arabic)]
+        self.assertTrue(found, arabic)
+        return found[0]
+
+    def test_sources_are_pinned_and_attributed(self):
+        glossary.verify_qac_files(ROOT / 'source_text')
+        provenance = read('source_text/provenance.json')['glossary']
+        self.assertEqual(provenance['commit'], glossary.QAC_COMMIT)
+        self.assertEqual({f['name']: f['sha256'] for f in provenance['files']},
+                         {name: digest for name, (digest, _path) in glossary.QAC_FILES.items()})
+        self.assertIn('corpus.quran.com', self.glossary['source'])
+        self.assertIn('Quranic Arabic Corpus', (ROOT / 'docs/data/NOTICE.txt').read_text(encoding='utf-8'))
+
+    def test_corpus_words_align_with_the_displayed_text(self):
+        corpus = glossary.load_corpus_words(ROOT / 'source_text')
+        self.assertEqual(sum(len(words) for words in corpus.values()), 77429)
+        notes, stats, others = glossary.annotate(ROOT / 'source_text', self.lines, build.tokenize, build.normalize)
+        self.assertEqual(stats['words'], 77800)
+        self.assertEqual((stats['split_words'], stats['extra_words'], stats['vocative_splits']), (370, 371, 361))
+        self.assertEqual(len(others), 9)
+        for row in self.lines:
+            self.assertEqual(len(notes[(row['play_id'], row['scene'])]), len(build.tokenize(row['text'])))
+        # The vocative is written apart in this text. Where the corpus glosses
+        # the joined word simply "O", both parts keep that gloss; otherwise
+        # the particle takes "O" and the rest of the gloss stays with the word.
+        first = notes[(2, 21)]
+        self.assertEqual(build.tokenize(self.lines[27]['text'])[:3], ['يا', 'أيها', 'الناس'])
+        self.assertEqual([n['gloss'] for n in first[:3]], ['O', 'O', 'mankind'])
+        self.assertEqual(first[0]['lemmas'], [('yaA', 'VOC', None)])
+        adam = notes[(2, 33)]
+        self.assertEqual(build.tokenize(self.lines[39]['text'])[1:3], ['يا', 'آدم'])
+        self.assertEqual([n['gloss'] for n in adam[1:3]], ['O', 'Adam'])
+        self.assertEqual([n['gloss'] for n in notes[(1, 1)]],
+                         ['In (the) name', '(of) Allah', 'the Most Gracious', 'the Most Merciful'])
+        self.assertEqual([n['gloss'] for n in notes[(37, 130)]][-2:], ['Elijah', 'Elijah'])
+        self.assertEqual([n['gloss'] for n in notes[(114, 6)]], ['From', 'the jinn', 'and men'])
+
+    def test_transliteration_and_gloss_cleanup(self):
+        self.assertEqual(glossary.display_lemma('{ll~ah'), nfc('اللَّه'))
+        self.assertEqual(glossary.display_lemma('r~aHiym'), nfc('رَحِيم'))
+        self.assertEqual(glossary.from_buckwalter('rHm'), 'رحم')
+        self.assertEqual(glossary.clean_gloss('"Peace be'), 'Peace be')
+        self.assertEqual(glossary.clean_gloss('(of) Allah,'), '(of) Allah')
+        self.assertEqual(glossary.gloss_words('(of) the Most Merciful.'), ['most', 'merciful'])
+        self.assertEqual(glossary.gloss_words('from'), ['from'])  # nothing but a common word
+        with self.assertRaises(ValueError):
+            glossary.from_buckwalter('é')
+
+    def test_forms_cover_the_vocabulary_exactly(self):
+        self.assertEqual(set(self.forms), set(self.tokens))
+        for form, (count, glosses, related) in self.forms.items():
+            self.assertEqual(count, total(self.tokens[form]), form)
+            self.assertTrue(1 <= len(glosses) <= 3 and all(glosses), form)
+            self.assertTrue(all(0 <= i < len(self.lemmas) for i in related))
+        self.assertEqual(self.forms['من'][1][:2], ['from', 'of'])
+        self.assertIn('mercy', [g.lower() for g in self.forms['رحمة'][1]])
+        self.assertEqual(self.forms['يا'][1], ['O'])
+
+    def test_lemmas_and_roots(self):
+        self.assertEqual(len(self.lemmas), 4933)
+        self.assertEqual(len({e['root'] for e in self.lemmas if e['root']}), 1642)
+        self.assertEqual([e['n'] for e in self.lemmas], sorted((e['n'] for e in self.lemmas), reverse=True))
+        for entry in self.lemmas:
+            self.assertEqual(entry['n'], sum(count for _, count in entry['forms']))
+            self.assertTrue(entry['ar'] and entry['pos'] and entry['en'] and entry['w'], entry)
+            for form, count in entry['forms']:
+                self.assertLessEqual(count, self.forms[form][0])
+        allah = self.lemma('اللَّه')
+        self.assertEqual((allah['n'], allah['root'], allah['pos']), (2699, 'اله', 'name'))
+        self.assertEqual({form for form, _ in allah['forms']},
+                         {w for w in self.tokens if DIVINE_NAME.match(w)})
+        mercy = self.lemma('رَحْمَة')
+        self.assertEqual((mercy['n'], mercy['root'], mercy['w'][0]), (114, 'رحم', ['mercy', 114]))
+        self.assertEqual(self.lemma('قَالَ')['def'], 'to say')
+        self.assertEqual(sum(e['n'] for e in self.lemmas if e['root'] == 'رحم'), 339)
+        self.assertEqual(self.lemma('مُوسَىٰ')['n'], 136)
 
 
 if __name__ == '__main__':

@@ -19,6 +19,11 @@ text-metric columns. Canonical URL: https://quran.contabulate.org/
   (27:30).
 - Each verse carries Pickthall's 1930 English as a reading aid. It is not
   indexed; the English column can be filtered in the Verse view.
+- For readers without Arabic, a lookup box finds Arabic words by English
+  meaning and inserts them as search terms, and the word views show an English
+  gloss, dictionary form, and root for every word. This data comes from the
+  Quranic Arabic Corpus and is aligned to the Simple text by
+  `scripts/glossary.py`. It is display-only.
 - “Words/Pause” replaces the sentence-length metric of other instances: the
   Arabic has no sentence punctuation, so the build counts stretches between
   recitation pauses.
@@ -45,6 +50,12 @@ Arabic text: © 2007–2026 Tanzil Project, Creative Commons Attribution 3.0.
 Tanzil permits verbatim copies only and asks for attribution and a link to
 tanzil.net; see `source_text/TANZIL-NOTICE.txt`, which the build also copies
 next to the generated data. Do not edit verse text.
+
+Word glosses, lemmas, and roots (`source_text/qac`, `docs/data/glossary.json`):
+the [Quranic Arabic Corpus](https://corpus.quran.com/) by Kais Dukes, which the
+project distributes under the GNU General Public License and asks to be named
+and linked as the source. The files come from
+`kaisdukes/quranic-corpus-api`, which has no license file of its own.
 
 English: Mohammed Marmaduke Pickthall, *The Meaning of the Glorious Koran*
 (1930), in the text Tanzil distributes as `en.pickthall` for non-commercial
