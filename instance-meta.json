@@ -1,0 +1,30 @@
+{
+  "id": "quran",
+  "emoji": "☪️",
+  "title": "Quran",
+  "tagline": "Quran Tabular Explorer",
+  "language": "Arabic",
+  "created": "2026-11-10",
+  "url": "https://quran.contabulate.org/",
+  "source": "https://github.com/brainheart/quran-contabulate",
+  "text_label": "suras",
+  "segment_label": "verses",
+  "sample_queries": [
+    {
+      "label": "Which suras never use the name Allah?",
+      "url": "https://quran.contabulate.org/?q=%5E%28%5B%D9%88%D9%81%D8%A3%5D%2A%5B%D8%A8%D8%AA%5D%3F%D8%A7%3F%7C%D8%A2%29%D9%84%D9%84%D9%87%24&mm=regex&nm=1&gran=play&zr=1&sk=t0_count&sd=asc"
+    },
+    {
+      "label": "Which sura names Allah most densely?",
+      "url": "https://quran.contabulate.org/?q=%5E%28%5B%D9%88%D9%81%D8%A3%5D%2A%5B%D8%A8%D8%AA%5D%3F%D8%A7%3F%7C%D8%A2%29%D9%84%D9%84%D9%87%24&mm=regex&nm=1&gran=play&ts=%255B%257B%2522t%2522%253A%2522%255E(%255B%25D9%2588%25D9%2581%25D8%25A3%255D*%255B%25D8%25A8%25D8%25AA%255D%253F%25D8%25A7%253F%257C%25D8%25A2)%25D9%2584%25D9%2584%25D9%2587%2524%2522%252C%2522m%2522%253A%2522regex%2522%252C%2522n%2522%253A1%252C%2522d%2522%253A%2522pct%2522%257D%255D&sk=t0_pct&sd=desc"
+    },
+    {
+      "label": "Which suras tell most of Moses (موسى)?",
+      "url": "https://quran.contabulate.org/?q=%5E%5B%D9%88%D9%81%D8%A8%D9%84%5D%2A%D9%85%D9%88%D8%B3%D9%89%24&mm=regex&nm=1&gran=play&sk=t0_count&sd=desc"
+    },
+    {
+      "label": "How many times does Ar-Rahman ask its refrain?",
+      "url": "https://quran.contabulate.org/?q=%D9%81%D8%A8%D8%A3%D9%8A%20%D8%A2%D9%84%D8%A7%D8%A1%20%D8%B1%D8%A8%D9%83%D9%85%D8%A7&gran=line&sk=location&sd=asc"
+    }
+  ]
+}

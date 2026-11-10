@@ -1,0 +1,29 @@
+{
+  "retrieved": "2026-11-10",
+  "publisher": "Tanzil Project, https://tanzil.net/",
+  "edition": "Tanzil Quran Text (Simple, Version 1.1)",
+  "license": "Creative Commons Attribution 3.0; verbatim copies only, with attribution and a link to tanzil.net",
+  "gloss": "Pickthall, The Meaning of the Glorious Koran (1930), Tanzil en.pickthall, last updated 2010-09-04; non-commercial use",
+  "files": [
+    {
+      "name": "quran-simple.xml",
+      "sha256": "f65540c630e7c645140323881de45cc3f5aebbd2b08720eb63ec06cf757f6fe9",
+      "url": "https://tanzil.net/pub/download/index.php?quranType=simple&outType=xml&agree=true&marks=true&sajdah=true&rub=true"
+    },
+    {
+      "name": "quran-simple-clean.txt",
+      "sha256": "228df2a717671aeb9d2ff573002bd28d6b3f973f4bc7153554e3a81663d67610",
+      "url": "https://tanzil.net/pub/download/index.php?quranType=simple-clean&outType=txt-2&agree=true"
+    },
+    {
+      "name": "quran-data.xml",
+      "sha256": "8867c1d88191472adec9db694b3cd9f135b1a2ef580574d32cf888dcb22c5c7a",
+      "url": "https://tanzil.net/res/text/metadata/quran-data.xml"
+    },
+    {
+      "name": "en.pickthall.txt",
+      "sha256": "4aabbfa9d96796f5a6b0217d2c39dce1a3084f772bf6f2650e37082a774e3cc7",
+      "url": "https://tanzil.net/trans/en.pickthall"
+    }
+  ]
+}

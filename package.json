@@ -1,0 +1,27 @@
+{
+  "name": "quran-contabulate",
+  "version": "1.0.0",
+  "description": "Quran tabular explorer",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "build": "python3 build.py",
+    "test": "playwright test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brainheart/quran-contabulate.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/brainheart/quran-contabulate/issues"
+  },
+  "homepage": "https://github.com/brainheart/quran-contabulate#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.58.2"
+  }
+}

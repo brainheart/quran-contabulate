@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sources · Quran Contabulate</title>
+  <link rel="stylesheet" href="css/main.css">
+  <style>main { max-width: 58rem; margin: auto; } h2 { color: var(--burgundy); margin-top: 2rem; } p, li { line-height: 1.55; } code { overflow-wrap: anywhere; }</style>
+</head>
+<body><main>
+  <p><a href="./">← Quran explorer</a></p>
+  <h1>Edition and sources</h1>
+  <h2>The Arabic text</h2>
+  <p>The text is the <a href="https://tanzil.net/">Tanzil Project</a>’s Quran text, Simple edition, version 1.1 (© 2007–2026 Tanzil Project), licensed <a href="https://creativecommons.org/licenses/by/3.0/">Creative Commons Attribution 3.0</a>. Tanzil permits verbatim copies only, and every verse is shown here exactly as published, including its vowel marks, pause signs, prostration signs (<span lang="ar">۩</span>), and ḥizb-quarter signs (<span lang="ar">۞</span>). Check <a href="https://tanzil.net/updates/">tanzil.net/updates</a> for later revisions of the text. Tanzil’s full notice travels with the data: <a href="lines/NOTICE.txt">NOTICE.txt</a>.</p>
+  <p>The Simple edition writes the text in modern standard spelling (<span lang="ar" dir="rtl">الْكِتَابُ</span>, <span lang="ar" dir="rtl">الصَّلَاةَ</span>), not the Uthmani spelling of printed copies. It was chosen because a word typed on an ordinary Arabic keyboard then matches the text. The reading is that of Ḥafṣ from ʿĀṣim, with the Kufan verse count of 6,236.</p>
+  <p>The source files were retrieved on 10 November 2026 and are checked by SHA-256 on every build.</p>
+  <h2>Suras, sections, and verses</h2>
+  <ul>
+    <li>The 114 suras are in the order of the written text. Their Arabic names, verse counts, period, and traditional order of revelation come from Tanzil’s metadata. The transliterated names and English meanings are conventional ones curated for this site.</li>
+    <li>The period is the customary label of a whole sura as Meccan (86 suras) or Medinan (28). Individual verses of a sura are sometimes assigned to the other period; that is not recorded here.</li>
+    <li>Sections are the 556 <i>rukūʿ</i> divisions in Tanzil’s metadata, numbered from 1 within each sura. They are a traditional reading division, shown as <code>§</code> in the Location column: <code>002.Baqarah.§34.255</code> is sura 2, section 34, verse 255.</li>
+    <li>The basmala (<span lang="ar" dir="rtl">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</span>) is verse 1 of the first sura and part of verse 27:30, and it is counted there. Before every other sura except the ninth it is an unnumbered heading. Those 112 headings are not rows and are not counted.</li>
+  </ul>
+  <h2>Search and counting</h2>
+  <p>Search and all counts use a search form of the text. Vowel marks, shadda, sukun, the superscript alef, pause and recitation signs, and tatweel are dropped, and alef wasla is read as plain alef. Letters are otherwise kept as written, so the hamza forms (<span lang="ar">أ إ آ ؤ ئ</span>), alef maksura (<span lang="ar">ى</span>), and ta marbuta (<span lang="ar">ة</span>) stay distinct. As a check, the build compares this search form with Tanzil’s own unvocalized Simple Clean edition; they agree on every verse.</p>
+  <p>A word is a run of letters between spaces, so particles written together with a word are part of it: <span lang="ar" dir="rtl">وَاللَّهُ</span>, <span lang="ar" dir="rtl">بِاللَّهِ</span>, and <span lang="ar" dir="rtl">لِلَّهِ</span> are three different words. A regex gathers them. For example, <code dir="ltr">^([وفأ]*[بت]?ا?|آ)لله$</code> finds every written form of the divine name, 2,699 occurrences. Regex patterns are matched against whole words in their search form.</p>
+  <p>Counted this way the text has 77,800 words and 14,868 distinct word forms. Counts of Uthmani-script copies are a little lower, because that spelling joins some words that the Simple spelling writes apart, such as the vocative <span lang="ar" dir="rtl">يَا</span>.</p>
+  <p>The Arabic has no sentence punctuation, so the Words/Pause metric counts the stretches between recitation pauses. A verse end and the pause signs <span lang="ar">ۘ ۚ ۖ ۗ</span> each end a stretch. The two three-dot signs <span lang="ar">ۛ</span> mark a pause taken at either place and count once. The “do not stop” sign <span lang="ar">ۙ</span> and the brief <i>saktah</i> sign <span lang="ar">ۜ</span> do not count.</p>
+  <h2>The English column</h2>
+  <p>The English is Mohammed Marmaduke Pickthall, <i>The Meaning of the Glorious Koran</i> (1930), in the verse-aligned text distributed by Tanzil as <a href="https://tanzil.net/trans/"><code>en.pickthall</code></a> (last updated 4 September 2010), which Tanzil provides for non-commercial use. It is a reading aid. It is not indexed: search terms, counts, and metrics all refer to the Arabic. To find English words, use the filter on the English column in the Verse view.</p>
+  <p>No commentary counts or proper-name lists are attached yet.</p>
+  <p><a href="./">Return to the explorer →</a></p>
+</main></body>
+</html>
