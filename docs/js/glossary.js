@@ -122,12 +122,13 @@
     let partial = 0;
     for (const [w, count] of entry.w) {
       if (w === word) exact += count;
-      else if (word.length >= 3 && w.startsWith(word)) partial += count;
+      // Short queries match whole words only: "sea" should not find "seated".
+      else if (word.length >= 4 && w.startsWith(word)) partial += count;
     }
     if (!exact && !partial && entry.def) {
       const inDefinition = englishWords(entry.def);
       if (inDefinition.includes(word)) exact = Math.max(1, Math.round(entry.n / 2));
-      else if (word.length >= 3 && inDefinition.some(w => w.startsWith(word))) partial = Math.max(1, Math.round(entry.n / 2));
+      else if (word.length >= 4 && inDefinition.some(w => w.startsWith(word))) partial = Math.max(1, Math.round(entry.n / 2));
     }
     return exact + partial / 2;
   }
