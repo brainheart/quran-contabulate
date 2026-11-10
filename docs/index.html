@@ -2487,13 +2487,13 @@
       { key: 'ngram', label: vocabColumnLabel(granVal), defaultDir: 'asc', type: 'text' },
       ...(glossaryAvailable ? [{ key: 'gloss', label: 'English (word by word)', defaultDir: 'asc', type: 'text',
         tooltip: n === 1
-          ? 'How the Quranic Arabic Corpus glosses this written form, most frequent glosses first. A reading aid; it is not searched.'
-          : 'The most frequent Quranic Arabic Corpus gloss of each word, in order. A reading aid; it is not searched.' }] : []),
+          ? 'English glosses of this written form, most frequent first. A reading aid; it is not searched.'
+          : 'The most frequent English gloss of each word, in order. A reading aid; it is not searched.' }] : []),
       ...((glossaryAvailable && n === 1) ? [
         { key: 'lemma', label: 'Dictionary form', defaultDir: 'asc', type: 'text',
-          tooltip: 'The dictionary form (lemma) this written form belongs to, from the Quranic Arabic Corpus. Several are listed when one spelling serves different words.' },
-        { key: 'root', label: 'Root', defaultDir: 'asc', type: 'text',
-          tooltip: 'The consonantal root, from the Quranic Arabic Corpus. Filter this column to gather every form built on one root.' },
+          tooltip: 'The dictionary form (lemma) this written form belongs to. Several are listed when one spelling serves different words. A reading aid; it is not searched.' },
+        ...(glossary.hasRoots() ? [{ key: 'root', label: 'Root', defaultDir: 'asc', type: 'text',
+          tooltip: 'The root this word is built on. Filter this column to gather every form built on one root.' }] : []),
       ] : []),
       { key: 'count', label: 'Count', type: 'number', defaultDir: 'desc' },
       { key: 'book_count', label: '# suras', type: 'number', defaultDir: 'desc' },

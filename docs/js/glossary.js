@@ -1,17 +1,27 @@
-// English reading aids from the Quranic Arabic Corpus: a gloss, lemma, and
-// root for every word form, and an English-to-Arabic lookup that inserts
-// search terms. Nothing here is searched or counted; it only helps a reader
-// who has little or no Arabic find and recognize words.
+// English reading aids, shared by the non-English Contabulate instances: a
+// gloss and dictionary form (and, where the language has them, a root) for
+// every word form, and an English lookup that inserts search terms. Nothing
+// here is searched or counted; it only helps a reader who has little or none
+// of the corpus language find and recognize words.
+//
+// Data contract (data/glossary.json, written by the instance's build):
+//   meta:   { lang, dir }               language tag and direction of the corpus
+//   forms:  { form: [count, [glosses], [lemma indexes]] }
+//   lemmas: [{ lemma, pos, root?, n, def?, en: [example glosses],
+//              w: [[english word, weight]], forms: [[form, count]] }]
+// The file must be identical in every instance: fix it once and copy it.
 
 (function () {
   'use strict';
 
   let data = null;
   let rootIndex = null;
+  let meta = { lang: '', dir: 'ltr' };
 
   function init(glossary) {
     if (!glossary || !glossary.forms || !Array.isArray(glossary.lemmas)) return false;
     data = glossary;
+    meta = Object.assign({ lang: '', dir: 'ltr' }, glossary.meta || {});
     rootIndex = new Map();
     data.lemmas.forEach((entry, i) => {
       if (!entry.root) return;
@@ -22,6 +32,7 @@
   }
 
   function available() { return !!data; }
+  function hasRoots() { return !!(rootIndex && rootIndex.size); }
 
   function formEntry(form) {
     return (data && Object.prototype.hasOwnProperty.call(data.forms, form)) ? data.forms[form] : null;
@@ -39,6 +50,8 @@
     return words.map(w => { const e = formEntry(w); return e && e[1].length ? e[1][0] : '…'; }).join(' · ');
   }
 
+  function listSeparator() { return meta.dir === 'rtl' ? '، ' : ', '; }
+
   function formLemmas(form) {
     const entry = formEntry(form);
     return entry ? entry[2].map(i => data.lemmas[i]).filter(Boolean) : [];
@@ -47,13 +60,13 @@
   function ngramLemma(ngram) {
     const words = String(ngram || '').split(' ').filter(Boolean);
     if (words.length !== 1) return '';
-    return Array.from(new Set(formLemmas(words[0]).map(e => e.ar))).join('، ');
+    return Array.from(new Set(formLemmas(words[0]).map(e => e.lemma))).join(listSeparator());
   }
 
   function ngramRoot(ngram) {
     const words = String(ngram || '').split(' ').filter(Boolean);
     if (words.length !== 1) return '';
-    return Array.from(new Set(formLemmas(words[0]).map(e => e.root).filter(Boolean))).join('، ');
+    return Array.from(new Set(formLemmas(words[0]).map(e => e.root).filter(Boolean))).join(listSeparator());
   }
 
   // --- A compact regex that matches exactly a set of word forms -------------
@@ -99,7 +112,7 @@
     return `^${backward.length < forward.length ? backward : forward}$`;
   }
 
-  // --- English (or Arabic) lookup ---------------------------------------------
+  // --- English lookup (a word of the corpus language is explained instead) ------
   function englishWords(text) {
     return String(text || '').toLowerCase().match(/[a-z]+(?:'[a-z]+)?/g) || [];
   }
@@ -121,23 +134,20 @@
     if (!data) return [];
     const text = String(query || '').trim();
     if (!text) return [];
-    if (/\p{Script=Arabic}/u.test(text)) {
-      // An Arabic word: show what it is.
-      const seen = new Set();
-      const out = [];
-      for (const word of tokenizeLineText(text)) {
-        for (const entry of formLemmas(word)) {
-          if (seen.has(entry)) continue;
-          seen.add(entry);
-          out.push({ entry, score: entry.n });
-        }
+    // A word of the corpus itself: show what it is, before any English match.
+    const seen = new Set();
+    const out = [];
+    for (const word of tokenizeLineText(text)) {
+      for (const entry of formLemmas(word)) {
+        if (seen.has(entry)) continue;
+        seen.add(entry);
+        out.push({ entry, score: Infinity });
       }
-      return out.slice(0, limit);
     }
     const words = englishWords(text);
-    if (!words.length) return [];
-    const out = [];
+    if (!words.length) return out.slice(0, limit);
     for (const entry of data.lemmas) {
+      if (seen.has(entry)) continue;
       let score = Infinity;
       for (const word of words) {
         const s = wordScore(entry, word);
@@ -146,7 +156,7 @@
       }
       if (score > 0 && score !== Infinity) out.push({ entry, score });
     }
-    out.sort((a, b) => (b.score - a.score) || (b.entry.n - a.entry.n));
+    out.sort((a, b) => (b.score === a.score ? 0 : b.score > a.score ? 1 : -1) || (b.entry.n - a.entry.n));
     return out.slice(0, limit);
   }
 
@@ -170,7 +180,7 @@
     if (entry.def) return entry.def;
     const top = entry.w.length ? entry.w[0][1] : 0;
     const words = entry.w.filter(([, c]) => c >= top * 0.25).slice(0, 3).map(([w]) => w);
-    return words.join(', ') || entry.en[0] || '';
+    return words.join(', ') || (entry.en || [])[0] || '';
   }
 
   // --- The lookup box -----------------------------------------------------------
@@ -186,11 +196,11 @@
       b.addEventListener('click', onClick);
       return b;
     }
-    function arabic(text, className) {
+    function foreign(text, className) {
       const span = document.createElement('span');
-      span.lang = 'ar';
-      span.dir = 'rtl';
-      span.className = className || 'arabic';
+      if (meta.lang) span.lang = meta.lang;
+      span.dir = meta.dir;
+      span.className = className || 'lexicon-foreign';
       span.textContent = text;
       return span;
     }
@@ -202,7 +212,7 @@
       if (!found.length) {
         const empty = document.createElement('p');
         empty.className = 'muted lexicon-empty';
-        empty.textContent = 'No Quranic word is glossed with that. Try another English word.';
+        empty.textContent = 'No word in this text is glossed with that. Try another English word.';
         results.appendChild(empty);
         return;
       }
@@ -213,7 +223,7 @@
         const head = document.createElement('div');
         head.className = 'lexicon-head';
         const allTitle = `Insert a pattern matching all ${cover.forms.length} written forms of this word`;
-        head.appendChild(button('lexicon-insert', [arabic(entry.ar, 'arabic lexicon-lemma')], allTitle, () => {
+        head.appendChild(button('lexicon-insert', [foreign(entry.lemma, 'lexicon-foreign lexicon-lemma')], allTitle, () => {
           insert(buildFormsRegex(cover.forms), 'regex');
           close();
         }));
@@ -231,13 +241,13 @@
 
         const examples = document.createElement('div');
         examples.className = 'muted lexicon-examples';
-        examples.textContent = entry.en.join(' · ');
-        item.appendChild(examples);
+        examples.textContent = (entry.en || []).join(' · ');
+        if (examples.textContent) item.appendChild(examples);
 
         const forms = document.createElement('div');
         forms.className = 'lexicon-forms';
         for (const [form, count] of entry.forms.slice(0, 8)) {
-          const label = [arabic(form), document.createTextNode(` ${formatCellNumber(count)}`)];
+          const label = [foreign(form), document.createTextNode(` ${formatCellNumber(count)}`)];
           forms.appendChild(button('lexicon-form', label, `Insert only this written form (${ngramGloss(form)})`, () => {
             insert(form, 'exact');
             close();
@@ -253,7 +263,7 @@
           const family = rootEntries(entry.root);
           if (family.length > 1) {
             const rootCover = coverage(family);
-            const label = [document.createTextNode('whole root '), arabic(Array.from(entry.root).join(' ')),
+            const label = [document.createTextNode('whole root '), foreign(Array.from(entry.root).join(' ')),
               document.createTextNode(` ${formatCellNumber(family.reduce((sum, e) => sum + e.n, 0))}`)];
             forms.appendChild(button('lexicon-form lexicon-root', label,
               `Insert a pattern matching every word from this root (${family.length} words, ${rootCover.forms.length} forms)`, () => {
@@ -282,7 +292,7 @@
   }
 
   window.contabulateGlossary = {
-    init, available, ngramGloss, ngramLemma, ngramRoot, formLemmas, search, summary,
+    init, available, hasRoots, ngramGloss, ngramLemma, ngramRoot, formLemmas, search, summary,
     coverage, rootEntries, formsOf, buildFormsRegex, wireLookup,
   };
 })();

@@ -221,7 +221,7 @@ class GlossaryTests(unittest.TestCase):
         cls.forms = cls.glossary['forms']
 
     def lemma(self, arabic):
-        found = [e for e in self.lemmas if nfc(e['ar']) == nfc(arabic)]
+        found = [e for e in self.lemmas if nfc(e['lemma']) == nfc(arabic)]
         self.assertTrue(found, arabic)
         return found[0]
 
@@ -285,7 +285,7 @@ class GlossaryTests(unittest.TestCase):
         self.assertEqual([e['n'] for e in self.lemmas], sorted((e['n'] for e in self.lemmas), reverse=True))
         for entry in self.lemmas:
             self.assertEqual(entry['n'], sum(count for _, count in entry['forms']))
-            self.assertTrue(entry['ar'] and entry['pos'] and entry['en'] and entry['w'], entry)
+            self.assertTrue(entry['lemma'] and entry['pos'] and entry['en'] and entry['w'], entry)
             for form, count in entry['forms']:
                 self.assertLessEqual(count, self.forms[form][0])
         allah = self.lemma('اللَّه')

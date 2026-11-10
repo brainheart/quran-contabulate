@@ -330,7 +330,7 @@ def build_glossary(source_path, lines, tokenize, normalize, max_glosses=4):
         glosses = lemma_glosses[key] or Counter(
             {g: c for form in lemma_forms[key] for g, c in form_glosses[form].items()})
         entry = {
-            "ar": "يَا" if lemma == "yaA" and pos == "VOC" else display_lemma(lemma),
+            "lemma": "يَا" if lemma == "yaA" and pos == "VOC" else display_lemma(lemma),
             "pos": POS_LABELS.get(pos, "particle"),
             "root": root,
             "n": sum(lemma_forms[key].values()),

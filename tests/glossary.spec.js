@@ -6,7 +6,7 @@ const tokens = require('../docs/data/tokens.json');
 
 const nfc = text => String(text).normalize('NFC');
 const total = word => (tokens[word] || []).reduce((sum, [, n]) => sum + n, 0);
-const lemma = arabic => glossary.lemmas.find(e => nfc(e.ar) === nfc(arabic));
+const lemma = arabic => glossary.lemmas.find(e => nfc(e.lemma) === nfc(arabic));
 
 async function ready(page, url = '/') {
   await page.goto(url);
@@ -27,7 +27,7 @@ test('an English word finds its Arabic dictionary forms and inserts all their sp
   await expect(page.locator('#lexicon')).toBeVisible();
   await page.fill('#lexiconInput', 'mercy');
   const first = page.locator('.lexicon-item').first();
-  await expect(first.locator('.lexicon-lemma')).toHaveText(lemma('رَحْمَة').ar);
+  await expect(first.locator('.lexicon-lemma')).toHaveText(lemma('رَحْمَة').lemma);
   await expect(first.locator('.lexicon-meaning')).toHaveText('mercy');
   await expect(first.locator('.lexicon-meta')).toContainText('noun · 114× in 17 forms');
   await expect(first.locator('.lexicon-meta')).toContainText('also catches 1 other use of the same spellings');
@@ -131,10 +131,10 @@ test('the lookup also explains an Arabic word, and says so when it finds nothing
   await ready(page);
   await page.fill('#lexiconInput', 'الرَّحِيمِ');
   await expect(page.locator('.lexicon-item')).toHaveCount(1);
-  await expect(page.locator('.lexicon-item .lexicon-lemma')).toHaveText(lemma('رَحِيم').ar);
+  await expect(page.locator('.lexicon-item .lexicon-lemma')).toHaveText(lemma('رَحِيم').lemma);
   await expect(page.locator('.lexicon-item .lexicon-examples')).toContainText('Most Merciful');
   await page.fill('#lexiconInput', 'zzzz');
-  await expect(page.locator('#lexiconResults')).toContainText('No Quranic word is glossed with that');
+  await expect(page.locator('#lexiconResults')).toContainText('No word in this text is glossed with that');
   await page.fill('#lexiconInput', '');
   await expect(page.locator('#lexiconResults')).toBeHidden();
   await page.fill('#lexiconInput', 'light');

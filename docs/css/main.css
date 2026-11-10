@@ -1197,7 +1197,7 @@ tr.pd-name-excluded td {
 
 /* Arabic is set larger than the Latin text around it: the vowel marks need
    the room, and the line height keeps stacked marks from colliding. */
-.arabic, [lang="ar"] {
+.arabic, .lexicon-foreign, [lang="ar"] {
   font-family: 'Amiri', 'Scheherazade New', 'Noto Naskh Arabic', 'Geeza Pro', 'Al Bayan', 'Traditional Arabic', 'Arabic Typesetting', serif;
 }
 td.arabic, td .arabic { font-size: 1.3em; }
@@ -1224,7 +1224,7 @@ p [lang="ar"] { font-size: 1.3em; font-style: normal; line-height: 1; }
 .lexicon-examples { margin: .15rem 0 .4rem; }
 .lexicon-forms { display: flex; flex-wrap: wrap; align-items: center; gap: .35rem; }
 .lexicon-form { font: inherit; font-size: .88rem; cursor: pointer; padding: .05rem .5rem; border: 1px solid var(--border, #d9cfb8); border-radius: 999px; background: #fff; color: inherit; }
-.lexicon-form .arabic { font-size: 1.25em; }
+.lexicon-form .lexicon-foreign { font-size: 1.25em; }
 .lexicon-form:hover, .lexicon-form:focus-visible { border-color: var(--burgundy, #8b1538); color: var(--burgundy, #8b1538); }
 .lexicon-root { border-style: dashed; }
 .lexicon-empty { margin: .7rem .8rem; }

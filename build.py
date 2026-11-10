@@ -235,6 +235,7 @@ def build(source_path: Path, out_dir: Path):
     write_json(data_dir / "glossary.json", {
         "source": "Quranic Arabic Corpus (https://corpus.quran.com), word-by-word translation and "
                   f"morphology, kaisdukes/quranic-corpus-api@{QAC_COMMIT[:7]}; GNU GPL",
+        "meta": {"lang": "ar", "dir": "rtl"},
         **glossary,
     })
     # Tanzil asks that its notice travel with files derived from the text.
