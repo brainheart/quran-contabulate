@@ -45,12 +45,13 @@
     const words = String(ngram || '').split(' ').filter(Boolean);
     if (words.length === 1) {
       const entry = formEntry(words[0]);
-      return entry ? entry[1].join('; ') : '';
+      // Glosses that are themselves lists are set apart more firmly.
+      return entry ? entry[1].join(entry[1].some(g => g.includes(';')) ? ' | ' : '; ') : '';
     }
     return words.map(w => { const e = formEntry(w); return e && e[1].length ? e[1][0] : '…'; }).join(' · ');
   }
 
-  function listSeparator() { return meta.dir === 'rtl' ? '، ' : ', '; }
+  function listSeparator() { return /^ar\b/.test(meta.lang) ? '، ' : ', '; }
 
   function formLemmas(form) {
     const entry = formEntry(form);
