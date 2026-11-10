@@ -130,7 +130,9 @@
       if (inDefinition.includes(word)) exact = Math.max(1, Math.round(entry.n / 2));
       else if (word.length >= 4 && inDefinition.some(w => w.startsWith(word))) partial = Math.max(1, Math.round(entry.n / 2));
     }
-    return exact + partial / 2;
+    // A whole-word match always outranks a match on the beginning of a word:
+    // "sing" should find "to sing" before "singular".
+    return exact + partial / 1000;
   }
   function search(query, limit = 12) {
     if (!data) return [];
